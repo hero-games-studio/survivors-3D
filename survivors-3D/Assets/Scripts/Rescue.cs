@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,14 +7,18 @@ public class Rescue : MonoBehaviour
 {
 
     public int rescueNumber;
-    public List<Rigidbody> salvage;
+    public List<GameObject> salvage;
     private Rigidbody rb;
+
+
+
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        salvage = new List<Rigidbody>();
+        salvage = new List<GameObject>();
+
     }
 
     // Update is called once per frame
@@ -42,14 +47,21 @@ public class Rescue : MonoBehaviour
                 {
                     surviver.rescue(salvage[salvage.Count-1]);
                 }*/
-
                 surviver.rescue(rb);
 
             }
 
-            salvage.Add(other.gameObject.GetComponent<Rigidbody>());
+            salvage.Add(other.gameObject);
         }
     }
 
 
+
+    internal void releaseSurvivors()
+    {
+        foreach(GameObject survived in salvage)
+        {
+            survived.GetComponent<Surviver>().endGame();
+        }
+    }
 }

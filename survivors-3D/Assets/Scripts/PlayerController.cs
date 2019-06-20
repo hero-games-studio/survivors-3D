@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     private float rotY;
     private float lastRotY;
 
-
+    private GameObject GM;
 
     private Vector2 lastMousePosition;
     private Quaternion lastRotation;
@@ -34,6 +34,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         lastRotation = transform.rotation;
+        GM = GameObject.FindWithTag("GameController");
     }
 
     private void FixedUpdate()
@@ -121,5 +122,16 @@ public class PlayerController : MonoBehaviour
         */
         transform.position = pos;
 
+    }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if (GM.GetComponent<Gamemanager>().onPlay)
+        {
+            if (other.gameObject.CompareTag("Finish"))
+            {
+                GM.GetComponent<Gamemanager>().finish();
+            }
+        }
     }
 }
