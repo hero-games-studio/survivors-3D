@@ -20,16 +20,17 @@ public class CameraMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Quaternion playeRotate = player.rotation;
+        //Quaternion playeRotate = player.rotation;
 
-        float rotateY = playeRotate.y;
-        if(rotateY < 0) { rotateY = -rotateY; }
-        offset.z = offsetZ + (rotateY * distance);
+        //float rotateY = playeRotate.y;
+
+        //if(rotateY < 0) { rotateY = -rotateY; }
+        //offset.z = offsetZ + (rotateY * distance);
         transform.position = player.position + offset;
 
-        Quaternion camRotation = new Quaternion(transform.rotation.x, playeRotate.y/rotateRate, transform.rotation.z, transform.rotation.w);
+        //Quaternion camRotation = new Quaternion(transform.rotation.x, playeRotate.y/rotateRate, transform.rotation.z, transform.rotation.w);
 
-        transform.rotation = Quaternion.Lerp(transform.rotation, camRotation, Time.deltaTime);
+        //transform.rotation = Quaternion.Lerp(transform.rotation, camRotation, Time.deltaTime);
 
 
 

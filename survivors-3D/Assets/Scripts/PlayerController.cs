@@ -6,12 +6,12 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 
-    [SerializeField] private float verticalSpeed = 200.0f;
+    [SerializeField] private float verticalSpeed = 300.0f;
     [SerializeField] private float horizontalSpeed = 150.0f;
-    [SerializeField] private float accelerateSpeed = 2f;
+    [SerializeField] private float accelerateSpeed = 3f;
     [SerializeField] private float turnSpeed = 15f;
     [SerializeField] private float sensitivity = 0.03f;
-    [SerializeField] private float lerpTimeMul = 1.5f;
+    [SerializeField] private float lerpTimeMul = 6f;
     private Rigidbody rb;
 
     [SerializeField] public float wallDistance = 2.5f;

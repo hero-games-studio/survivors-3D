@@ -14,15 +14,25 @@ public class Surviver : MonoBehaviour
     public float survivedNumber;
 
     //[SerializeField] private ConfigurableJoint joint;
+
+    
     private Rigidbody connectedRB;
+
     private float distance;
     private float spring = 0.1f;
     private float damper = 5f;
 
 
+    /*
+    private float allowedDistance = 2.5f;
+    private float targetDistance;
+    private float followSpeed;
+    private RaycastHit shot;
+    */
+
 
     // Start is called before the first frame update
-    void Start()
+    void Start() 
     {
         isSurvived = false;
         rb = GetComponent<Rigidbody>();
@@ -32,13 +42,37 @@ public class Surviver : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (isSurvived) { followPlayer(); }
+
+        /*
+        if (isSurvived)
+        {
+            transform.LookAt(connectedRB.transform);
+            if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out shot))
+            {
+                targetDistance = shot.distance;
+                if(targetDistance >= allowedDistance)
+                {
+                    followSpeed = 0.1f;
+                    transform.position = Vector3.MoveTowards(transform.position,connectedRB.position,followSpeed);
+                }
+                else
+                {
+                    followSpeed = 0;
+
+                }
+            }
+
+        }
+        */      
+
     }
 
     private void FixedUpdate()
     {
+
         if (isSurvived)
         {
+
             var connection = rb.position - connectedRB.position;
             var distanceDiscrepancy = distance - connection.magnitude;
 
@@ -46,29 +80,20 @@ public class Surviver : MonoBehaviour
 
             var velocityTarget = connection + (rb.velocity + Physics.gravity * spring);
             var projectOnConnection = Vector3.Project(velocityTarget, connection);
+
             rb.velocity = (velocityTarget - projectOnConnection) / (1 + damper * Time.fixedDeltaTime);
         }
+
     }
 
 
-    /*
-    private void followPlayer()
-    {
-        offset.z = followRange+survivedNumber;
-        Quaternion playeRotate = player.rotation;
-        Vector3 destinationPosition = player.position + offset;
-        Debug.Log(offset + " ||| " + player.position + " ||| " + destinationPosition);
-        transform.LookAt(player);
-        rb.MovePosition(destinationPosition);
-        //transform.position = destinationPosition;//Vector3.Lerp(transform.position, destinationPosition, Time.deltaTime);
-
-    }*/
-
     public void rescue(Rigidbody followTO)
-    {
+    { 
         isSurvived = true;
+
         connectedRB = followTO;
         distance = Vector3.Distance(rb.position, connectedRB.position) + offset;
+        //allowedDistance = Vector3.Distance(rb.position, connectedRB.position) + offset;
         //joint.connectedBody = followTO;
     }
 }
