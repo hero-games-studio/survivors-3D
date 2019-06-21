@@ -129,9 +129,11 @@ MonoBehaviour:
   offset: 1.5
   followAnchor: {x: 0, y: 0.5, z: 0}
   survivedNumber: 0
-  camera: {fileID: 0}
+  camera: {fileID: 644318355444601997, guid: 112a5e30f062a47cda6bc3fca4f01d25, type: 3}
   connectedRB: {fileID: 0}
   smiles: {fileID: 1409010823}
+  sailport: {fileID: 5341774511122249144, guid: f081219c646ec42d39137f08543e6733,
+    type: 3}
 --- !u!1001 &8020267739841547797
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -198,6 +200,31 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8020267741224895122, guid: 491d1a2dfb64e4700ad4dd95efef5cd9,
+        type: 3}
+      propertyPath: SizeModule.enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8020267741224895122, guid: 491d1a2dfb64e4700ad4dd95efef5cd9,
+        type: 3}
+      propertyPath: SizeModule.curve.maxCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8020267741224895122, guid: 491d1a2dfb64e4700ad4dd95efef5cd9,
+        type: 3}
+      propertyPath: SizeModule.curve.maxCurve.m_Curve.Array.data[0].outSlope
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8020267741224895122, guid: 491d1a2dfb64e4700ad4dd95efef5cd9,
+        type: 3}
+      propertyPath: SizeModule.curve.maxCurve.m_Curve.Array.data[1].value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8020267741224895122, guid: 491d1a2dfb64e4700ad4dd95efef5cd9,
+        type: 3}
+      propertyPath: SizeModule.curve.maxCurve.m_Curve.Array.data[1].outSlope
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 491d1a2dfb64e4700ad4dd95efef5cd9, type: 3}

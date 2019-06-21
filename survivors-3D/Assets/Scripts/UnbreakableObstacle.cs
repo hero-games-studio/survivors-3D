@@ -5,7 +5,7 @@ using UnityEngine;
 public class UnbreakableObstacle : MonoBehaviour
 {
 
-    [SerializeField] private Camera camera;
+    [SerializeField] private GameObject player;
 
 
 
@@ -18,7 +18,7 @@ public class UnbreakableObstacle : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(camera.gameObject.transform.position.z > transform.position.z + 2)
+        if(player.transform.position.z > transform.position.z + 10)
         {
             Destroy(gameObject);
         }

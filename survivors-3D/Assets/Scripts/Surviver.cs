@@ -13,8 +13,6 @@ public class Surviver : MonoBehaviour
     [SerializeField] private Vector3 followAnchor = new Vector3(0,0.5f,0);
     public float survivedNumber;
 
-
-    [SerializeField] private Camera camera;
     //[SerializeField] private ConfigurableJoint joint;
 
 
@@ -39,6 +37,7 @@ public class Surviver : MonoBehaviour
 
     private float oldSpeed;
 
+    [SerializeField] private GameObject sailport;
 
 
     // Start is called before the first frame update
@@ -90,7 +89,7 @@ public class Surviver : MonoBehaviour
         }
 
 
-        if (camera.gameObject.transform.position.z > transform.position.z + 5)
+        if (player.transform.position.z > transform.position.z + 10)
         {
             Destroy(gameObject);
         }
@@ -102,8 +101,9 @@ public class Surviver : MonoBehaviour
     {
         smiles.Play();
         isSurvived = false;
-        Vector3 newPos = new Vector3(UnityEngine.Random.Range(-5,5),0,15);
-        rb.velocity = newPos*50*0.03f;
+        rb.velocity = new Vector3(0,0,0);
+        rb.velocity = (sailport.transform.position - transform.position) * 50 * 0.03f;
+        Destroy(gameObject,1f);
     }
 
     private void FixedUpdate()

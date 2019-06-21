@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     private float rotY;
     private float lastRotY;
 
-    private GameObject GM;
+    [SerializeField] private GameObject GM;
 
     private Vector2 lastMousePosition;
     private Quaternion lastRotation;
@@ -34,7 +34,6 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         lastRotation = transform.rotation;
-        GM = GameObject.FindWithTag("GameController");
     }
 
     private void FixedUpdate()
