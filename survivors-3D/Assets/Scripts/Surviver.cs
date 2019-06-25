@@ -8,7 +8,6 @@ public class Surviver : MonoBehaviour
 
     public bool isSurvived;
     public Rigidbody rb;
-    [SerializeField] private Transform player;
     [SerializeField] private float offset = .1f;
     [SerializeField] private Vector3 followAnchor = new Vector3(0,0.5f,0);
     public float survivedNumber;
@@ -87,14 +86,6 @@ public class Surviver : MonoBehaviour
             }
 
         }
-
-
-        if (player.transform.position.z > transform.position.z + 10)
-        {
-            Destroy(gameObject);
-        }
-
-
     }
 
     internal void endGame()
@@ -131,6 +122,7 @@ public class Surviver : MonoBehaviour
         isSurvived = true;
         connectedRB = followTO;
         smiles.Play();
+        gameObject.GetComponentInParent<SceneManager>().deleteFromObjectList(gameObject);
         //distance = Vector3.Distance(rb.position, connectedRB.position) + offset;
         //allowedDistance = Vector3.Distance(rb.position, connectedRB.position) + offset;
         //joint.connectedBody = followTO;

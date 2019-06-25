@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     private float rotY;
     private float lastRotY;
 
-    [SerializeField] private GameObject GM;
+    private Gamemanager GM = Gamemanager.Instance;
 
     private Vector2 lastMousePosition;
     private Quaternion lastRotation;
@@ -125,11 +125,11 @@ public class PlayerController : MonoBehaviour
 
     public void OnTriggerEnter(Collider other)
     {
-        if (GM.GetComponent<Gamemanager>().onPlay)
+        if (GM.onPlay)
         {
             if (other.gameObject.CompareTag("Finish"))
             {
-                GM.GetComponent<Gamemanager>().finish();
+                GM.finish();
             }
         }
     }

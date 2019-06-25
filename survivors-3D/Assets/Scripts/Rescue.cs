@@ -48,10 +48,9 @@ public class Rescue : MonoBehaviour
                     surviver.rescue(salvage[salvage.Count-1]);
                 }*/
                 surviver.rescue(rb);
+                salvage.Add(other.gameObject);
 
             }
-
-            salvage.Add(other.gameObject);
         }
     }
 

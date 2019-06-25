@@ -6,13 +6,40 @@ using UnityEngine.UI;
 public class Gamemanager : MonoBehaviour
 {
 
+
+    private Gamemanager() { }
+
+    private static Gamemanager _instance;
+    public static Gamemanager Instance {
+        get
+        {
+            if (_instance == null)
+            {
+                GameObject go = new GameObject("Gamemanager");
+                go.AddComponent<Gamemanager>();
+            }
+            return _instance;
+        }
+    }
+
+    void Awake()
+    {
+        _instance = this;
+    }
+
     public int level = 1;
     public bool onPlay;
     public bool gameOver;
 
     [SerializeField] private GameObject player;
-    [SerializeField] private GameObject finishPoint;
+
+    public GameObject finishPoint;
+
     [SerializeField] private Slider progressBar;
+
+    [SerializeField] private SceneManager SM;
+
+    public int numOfSurviver = 0;
 
 
 
@@ -21,6 +48,7 @@ public class Gamemanager : MonoBehaviour
     {
         onPlay = true;
         gameOver = false;
+        SM.createPath(level);
     }
 
     // Update is called once per frame
@@ -35,5 +63,6 @@ public class Gamemanager : MonoBehaviour
         level++;
         player.GetComponent<Rescue>().releaseSurvivors();
         player.GetComponent<PlayerController>().enabled = false;
+        numOfSurviver = 0;
     }
 }

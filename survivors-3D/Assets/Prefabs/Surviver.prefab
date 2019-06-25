@@ -61,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: b98c9dd478b6b4d549d6fc56c7fd4081, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -129,7 +129,6 @@ MonoBehaviour:
   offset: 1.5
   followAnchor: {x: 0, y: 0.5, z: 0}
   survivedNumber: 0
-  camera: {fileID: 644318355444601997, guid: 112a5e30f062a47cda6bc3fca4f01d25, type: 3}
   connectedRB: {fileID: 0}
   smiles: {fileID: 1409010823}
   sailport: {fileID: 5341774511122249144, guid: f081219c646ec42d39137f08543e6733,

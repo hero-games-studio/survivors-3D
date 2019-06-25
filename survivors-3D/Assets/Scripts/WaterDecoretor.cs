@@ -2,13 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnbreakableObstacle : MonoBehaviour
+public class WaterDecoretor : MonoBehaviour
 {
-
-    [SerializeField] private GameObject player;
-
-
-
     // Start is called before the first frame update
     void Start()
     {
@@ -18,9 +13,6 @@ public class UnbreakableObstacle : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(player.transform.position.z > transform.position.z + 10)
-        {
-            Destroy(gameObject);
-        }
+        
     }
 }
