@@ -5,22 +5,35 @@ using UnityEngine;
 
 public class SceneManager : MonoBehaviour
 {
-    
-    [SerializeField] private GameObject player;
-    [SerializeField] public GameObject finishPoint;
-    [SerializeField] public GameObject camera;
 
-    private Gamemanager GM = Gamemanager.Instance;
+    #region Singelton
+    private SceneManager() { }
+
+    public static SceneManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            //Destroy(gameObject);
+        }
+
+    }
+    #endregion
+
+    [SerializeField] private GameObject player;
+    public GameObject finishPoint;
 
     [SerializeField] private Vector3 playerStrartCor;
     [SerializeField] private Vector3 finishPointCor;
 
 
     [SerializeField] private GameObject water;
-    [SerializeField] private GameObject underWater;
 
-    [SerializeField] private List<GameObject> obstaclePool = new List<GameObject>();
-    [SerializeField] private GameObject surviver;
 
     [SerializeField] private List<GameObject> objectsOnScene = new List<GameObject>();
 
@@ -30,7 +43,7 @@ public class SceneManager : MonoBehaviour
     [SerializeField] private float currentZ;
     [SerializeField] private float maxObsDis = 10f;
     [SerializeField] private float minObsDis = 2f;
-    [SerializeField] private float wallDis = 2.5f;
+    public float wallDis = 2.5f;
     [SerializeField] private float freeSpace = 2f;
     [SerializeField] private Vector3 spawnPoint;
 
@@ -41,74 +54,75 @@ public class SceneManager : MonoBehaviour
     private float length = 2;
     private float width = 2;
 
-
+    
     [SerializeField] private float baseLength = 5f;
     [SerializeField] private float additionalLevelLength = 2f;
+
+    [SerializeField] private int numberOfObjectOnScene = 10;
+
+    private ObjectPooler pool;
+    private Gamemanager GM;
 
     // Start is called before the first frame update
     void Start()
     {
         playerStrartCor = new Vector3(0,.25f,0);
         finishPointCor = Vector3.zero;
-        currentZ = 0f;
+        currentZ = freeSpace+minObsDis;
         spawnPoint = Vector3.zero;
 
-
-
-        //a1
-        currentZ += UnityEngine.Random.Range(minObsDis, maxObsDis);
-        spawnPoint = DefaultSpawn + new Vector3(UnityEngine.Random.Range(-wallDis, wallDis), 0, currentZ);
-        lastCreatedObject = Instantiate(surviver, spawnPoint, surviver.transform.rotation) as GameObject;
-        GM.numOfSurviver += 1;
-        //start
-        while ((finishPoint.transform.position.z - currentZ) > (maxObsDis + freeSpace))
-        {
-            spawnObject();
-        }
+        pool = ObjectPooler.Instance;
+        GM = Gamemanager.Instance;
     }
 
 
     public void createPath(int lv)
     {
         length = lv * additionalLevelLength + baseLength;
-        width = length / 3;
-
-        water.transform.localScale = new Vector3(width,1,length);
-        underWater.transform.localScale = new Vector3(2, 1, length);
-        Shader.SetGlobalFloat("RippleSimmness", width);
-
-
+        water.transform.localScale = new Vector3(2,1,length);
         water.transform.position = new Vector3(0, 0, (length * 5) - 5);
-        underWater.transform.position = new Vector3(0, -.01f, (length * 5) - 5);
 
-        finishPoint = Instantiate(finishPoint) as GameObject;
+        finishPoint.SetActive(true);
         finishPoint.transform.position = new Vector3(0, 0, length * 8);
 
         GM.finishPoint = finishPoint;
-        currentZ += freeSpace;
 
+        for(int i = 0; i < numberOfObjectOnScene; i++)
+        {
+            if ((finishPoint.transform.position.z - (maxObsDis + freeSpace + minObsDis)) > (currentZ))
+            {
+                OnObjectSpawn();
+            }
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (objectsOnScene.Count >= 0)
+
+        if (objectsOnScene.Count > 0)
         {
             if ((objectsOnScene[0].transform.position.z + removeDis) <= (player.transform.position.z))
             {
                 deleteObstacle();
+
+                if ((finishPoint.transform.position.z - (removeDis + freeSpace + minObsDis)) > (currentZ))
+                {
+                    OnObjectSpawn();
+                }
             }
         }
     }
 
     private void deleteObstacle()
     {
-        Destroy(objectsOnScene[0]);
+        objectsOnScene[0].SetActive(false);
+        objectsOnScene[0].GetComponent<Rigidbody>().velocity = Vector3.zero;
         objectsOnScene.RemoveAt(0);
     }
 
 
-    void spawnObject()
+    public void OnObjectSpawn()
     {
         
         currentZ += UnityEngine.Random.Range(minObsDis, maxObsDis);
@@ -117,15 +131,14 @@ public class SceneManager : MonoBehaviour
         if(rate<createSurviverRate)
 
         {//create surviver
-            lastCreatedObject = Instantiate(surviver, spawnPoint, surviver.transform.rotation) as GameObject;
+            lastCreatedObject = pool.SpawnFromPool("Surviver", spawnPoint);
             GM.numOfSurviver += 1;
         }
         else
         {//create obs
-            GameObject newObject = obstaclePool[UnityEngine.Random.Range(0, (obstaclePool.Count - 1))];
-            lastCreatedObject = Instantiate(newObject, spawnPoint, newObject.transform.rotation) as GameObject;
+            lastCreatedObject = pool.SpawnFromPool("Wood", spawnPoint);
         }
-        lastCreatedObject.transform.SetParent(transform);
+
         objectsOnScene.Add(lastCreatedObject);
 
     }
@@ -133,5 +146,26 @@ public class SceneManager : MonoBehaviour
     public void deleteFromObjectList(GameObject dObject)
     {
         objectsOnScene.Remove(dObject);
+
+        if ((finishPoint.transform.position.z - (removeDis + freeSpace + minObsDis)) > (currentZ))
+        {
+            OnObjectSpawn();
+        }
+    }
+
+    public void ReloadScene()
+    {
+        finishPoint.SetActive(false);
+        while (objectsOnScene.Count > 0)
+        {
+            deleteObstacle();
+        }
+        objectsOnScene.Clear();
+        finishPointCor = Vector3.zero;
+        currentZ = freeSpace + minObsDis;
+        spawnPoint = Vector3.zero;
+        player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        player.transform.position = playerStrartCor;
+        player.transform.rotation = Quaternion.Euler(0,0,0);
     }
 }

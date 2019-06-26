@@ -1,68 +1,124 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+
 
 public class Gamemanager : MonoBehaviour
 {
 
-
+    #region Singelton
     private Gamemanager() { }
 
-    private static Gamemanager _instance;
-    public static Gamemanager Instance {
-        get
-        {
-            if (_instance == null)
-            {
-                GameObject go = new GameObject("Gamemanager");
-                go.AddComponent<Gamemanager>();
-            }
-            return _instance;
-        }
-    }
+    public static Gamemanager Instance { get; private set; }
 
-    void Awake()
+    private void Awake()
     {
-        _instance = this;
+        if(Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            //Destroy(gameObject);
+        }
+        
     }
+    #endregion
 
-    public int level = 1;
+    public int level;
+    public int rescuedNum;
     public bool onPlay;
-    public bool gameOver;
+
 
     [SerializeField] private GameObject player;
 
     public GameObject finishPoint;
 
-    [SerializeField] private Slider progressBar;
-
-    [SerializeField] private SceneManager SM;
-
     public int numOfSurviver = 0;
 
+    private SceneManager SM;
+    private UIManager UIM;
 
+    private IEnumerator coroutine;
 
     // Start is called before the first frame update
     void Start()
     {
-        onPlay = true;
-        gameOver = false;
+
+        GameData loadData = SaveSystem.LoadGameData();
+        if (loadData != null)
+        {
+            level = loadData.level;
+            rescuedNum = loadData.rescuedNum;
+        }
+
+        SM = SceneManager.Instance;
+        UIM = UIManager.Instance;
+
+
+        UIM.OnWait();
+        onPlay = false;
         SM.createPath(level);
+        player.GetComponent<Rescue>().rescueNumber = 0;
+
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        progressBar.value = player.transform.position.z / finishPoint.transform.position.z;
+
+        UIM.UpdateProgress((player.transform.position.z / finishPoint.transform.position.z));
+
+    }
+
+
+    IEnumerator Example()
+    {
+        yield return new WaitForSeconds(3);
+    }
+
+    public void runnGame()
+    {
+        onPlay = true;
+        UIM.OnPlay();
     }
 
     public void finish()
     {
-        onPlay = false;
+
+        
         level++;
+        rescuedNum += player.GetComponent<Rescue>().rescueNumber;
         player.GetComponent<Rescue>().releaseSurvivors();
-        player.GetComponent<PlayerController>().enabled = false;
         numOfSurviver = 0;
+        onPlay = false;
+
+        coroutine = resetScene(1f);
+        StartCoroutine(coroutine);
+
+        SaveSystem.SaveGameData(Instance);
+
+    }
+
+    public void Gameover()
+    {
+        
+        player.GetComponent<Rescue>().Reset();
+        numOfSurviver = 0;
+        onPlay = false;
+
+        coroutine = resetScene(0.5f);
+        StartCoroutine(coroutine);
+    }
+
+
+
+    private IEnumerator resetScene(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        SM.ReloadScene();
+        SM.createPath(level);
+        UIM.OnWait();
     }
 }

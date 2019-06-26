@@ -29,7 +29,7 @@ public class Rescue : MonoBehaviour
 
     public void OnCollisionEnter(Collision other)
     {
-        if (other.gameObject.CompareTag("Surviver"))
+		if (other.gameObject.CompareTag("Surviver"))
         {
 
             Surviver surviver = other.gameObject.GetComponent<Surviver>();
@@ -38,15 +38,6 @@ public class Rescue : MonoBehaviour
             if (!surviver.isSurvived)
             {
                 rescueNumber += 1;
-                /*
-                if(salvage.Count == 0)
-                {
-                    surviver.rescue(rb);
-                }
-                else
-                {
-                    surviver.rescue(salvage[salvage.Count-1]);
-                }*/
                 surviver.rescue(rb);
                 salvage.Add(other.gameObject);
 
@@ -58,9 +49,23 @@ public class Rescue : MonoBehaviour
 
     internal void releaseSurvivors()
     {
-        foreach(GameObject survived in salvage)
+        rescueNumber = 0;
+        while (salvage.Count > 0)
         {
-            survived.GetComponent<Surviver>().endGame();
+            salvage[0].GetComponent<Surviver>().endGame();
+            salvage.RemoveAt(0);
         }
+        salvage.Clear();
+    }
+
+    internal void Reset()
+    {
+        rescueNumber = 0;
+        while (salvage.Count > 0)
+        {
+            salvage[0].GetComponent<Surviver>().Reset();
+            salvage.RemoveAt(0);
+        }
+        salvage.Clear();
     }
 }

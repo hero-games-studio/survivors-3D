@@ -14,19 +14,20 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float lerpTimeMul = 6f;
     private Rigidbody rb;
 
-    [SerializeField] public float wallDistance = 2.5f;
+    private float wallDistance;
     //[SerializeField] public float minCamDistance = 6.2f;
 
-    [SerializeField] private float maxRotate= 55f;
+    [SerializeField] private float maxRotate = 55f;
 
 
     private float rotY;
     private float lastRotY;
 
-    private Gamemanager GM = Gamemanager.Instance;
-
     private Vector2 lastMousePosition;
     private Quaternion lastRotation;
+
+    private Gamemanager GM;
+    private SceneManager SM;
 
 
     // Start is called before the first frame update
@@ -34,12 +35,21 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         lastRotation = transform.rotation;
+
+        GM = Gamemanager.Instance;
+        SM = SceneManager.Instance;
+
+        wallDistance = SM.wallDis;
+
     }
 
     private void FixedUpdate()
     {
-        Vector3 forw = Vector3.forward * verticalSpeed * Time.deltaTime;
-        rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, forw.z);
+        if (GM.onPlay)
+        {
+            Vector3 forw = Vector3.forward * verticalSpeed * Time.deltaTime;
+            rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, forw.z);
+        }
     }
 
     // Update is called once per frame
@@ -47,67 +57,72 @@ public class PlayerController : MonoBehaviour
     {
         //Debug.Log(transform.rotation.eulerAngles);
         //Debug.Log(Input.GetAxis("Horizontal") + " " + Input.GetAxis("Vertical"));
-        Vector2 deltaPosition = Vector2.zero;
 
-
-        if (Input.GetMouseButton(0))
+        if (GM.onPlay)
         {
-            Vector2 currentMousePosition = Input.mousePosition;
-
-            if (lastMousePosition == Vector2.zero) { lastMousePosition = currentMousePosition; }
-
-            deltaPosition = currentMousePosition - lastMousePosition;
-            lastMousePosition = currentMousePosition;
-
-
-
-
-
-            rotY += deltaPosition.x * Time.deltaTime * turnSpeed;
-            rotY = Mathf.Clamp(rotY, -maxRotate, maxRotate);
-            //if (rotY > maxRotate) { rotY = maxRotate; }
-            //if (rotY < -maxRotate) { rotY = -maxRotate; }
-
-
-            //transform.rotation = Quaternion.Euler(0,rotY,0);
-
-            if(deltaPosition != Vector2.zero)
+            if ((transform.rotation.eulerAngles.x < 275 && transform.rotation.eulerAngles.x > 45) ||
+                (transform.rotation.eulerAngles.x < -45 && transform.rotation.eulerAngles.x > -275) ||
+                (transform.rotation.eulerAngles.z < 275 && transform.rotation.eulerAngles.z > 45) ||
+                (transform.rotation.eulerAngles.z < -45 && transform.rotation.eulerAngles.z > -275))
             {
-                lastRotY = rotY;
-                Quaternion currentRotation = Quaternion.Euler(0, rotY, 0);
-                lastRotation = currentRotation;
-                //Debug.Log(rotY + " -> " + lastRotation + " ||| " + currentRotation);
-                transform.rotation = Quaternion.Lerp(transform.rotation, lastRotation, Time.deltaTime*lerpTimeMul);
-                //transform.rotation = lastRotation;
+                Debug.Log("Gameover");
+                GM.Gameover();
             }
 
 
+            Vector2 deltaPosition = Vector2.zero;
+
+
+            if (Input.GetMouseButton(0))
+            {
+                Vector2 currentMousePosition = Input.mousePosition;
+
+                if (lastMousePosition == Vector2.zero) { lastMousePosition = currentMousePosition; }
+
+                deltaPosition = currentMousePosition - lastMousePosition;
+                lastMousePosition = currentMousePosition;
+
+                rotY += deltaPosition.x * Time.deltaTime * turnSpeed;
+                rotY = Mathf.Clamp(rotY, -maxRotate, maxRotate);
+                //if (rotY > maxRotate) { rotY = maxRotate; }
+                //if (rotY < -maxRotate) { rotY = -maxRotate; }
+
+
+                //transform.rotation = Quaternion.Euler(0,rotY,0);
+
+                if (deltaPosition != Vector2.zero)
+                {
+                    lastRotY = rotY;
+                    Quaternion currentRotation = Quaternion.Euler(0, rotY, 0);
+                    lastRotation = currentRotation;
+                    //Debug.Log(rotY + " -> " + lastRotation + " ||| " + currentRotation);
+                    transform.rotation = Quaternion.Lerp(transform.rotation, lastRotation, Time.deltaTime * lerpTimeMul);
+                    //transform.rotation = lastRotation;
+                }
+
+
+            }
+            else
+            {
+                lastMousePosition = Vector2.zero;
+                lastRotation = new Quaternion(0f, 0f, 0f, 1f);
+                rotY = 0;//transform.rotation.eulerAngles.y;
+                         //rb.velocity = Vector3.zero;
+            }
+
+            Vector3 force = new Vector3(deltaPosition.x, 0, 0) * horizontalSpeed * sensitivity;
+            //rb.AddForce(force);
+            rb.velocity = new Vector3(force.x, rb.velocity.y, rb.velocity.z);
+
+
+            Vector3 rotationForce = new Vector3(rb.rotation.y, 0, 0) * horizontalSpeed * sensitivity * accelerateSpeed;
+            rb.velocity = new Vector3(rotationForce.x, rb.velocity.y, rb.velocity.z);
         }
-        else
-        {
-            lastMousePosition = Vector2.zero;
-            lastRotation = new Quaternion(0f, 0f, 0f, 1f);
-            rotY = 0;//transform.rotation.eulerAngles.y;
-            //rb.velocity = Vector3.zero;
-        }
-
-
-
-
-        Vector3 force = new Vector3(deltaPosition.x, 0, 0) * horizontalSpeed * sensitivity;
-        //rb.AddForce(force);
-        rb.velocity = new Vector3(force.x, rb.velocity.y, rb.velocity.z);
-
-
-        Vector3 rotationForce = new Vector3(rb.rotation.y, 0, 0) * horizontalSpeed * sensitivity * accelerateSpeed;
-        rb.velocity = new Vector3(rotationForce.x, rb.velocity.y, rb.velocity.z);
     }
 
 
     private void LateUpdate()
     {
-
-
         Vector3 pos = transform.position;
 
         if (pos.x > wallDistance) { pos.x = wallDistance; }

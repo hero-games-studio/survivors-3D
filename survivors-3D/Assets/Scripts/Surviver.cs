@@ -60,18 +60,6 @@ public class Surviver : MonoBehaviour
                 transform.LookAt(connectedRB.transform);
 
                 targetDistance = shot.distance;
-                /*
-                if (targetDistance >= allowedDistance)
-                {
-                    followSpeed = 0.18f;
-                    transform.position = Vector3.MoveTowards(transform.position, connectedRB.position, followSpeed);
-                }
-                else
-                {
-                    followSpeed = 0;
-
-                }*/
-
 
                 float newSpeed = Mathf.Clamp(((targetDistance-minSpeed)/disDiv), minSpeed, maxSpeed);
 
@@ -81,8 +69,6 @@ public class Surviver : MonoBehaviour
                 {
                     rb.velocity = (connectedRB.position - transform.position)* (connectedRB.position - transform.position).z;
                 }
-                //transform.position = Vector3.Lerp(transform.position, connectedRB.position, Mathf.Lerp(oldSpeed, newSpeed, Time.deltaTime * 20));
-                //transform.position = Vector3.MoveTowards(transform.position, connectedRB.position, Mathf.Lerp(oldSpeed, newSpeed, Time.deltaTime*20));
             }
 
         }
@@ -92,9 +78,21 @@ public class Surviver : MonoBehaviour
     {
         smiles.Play();
         isSurvived = false;
-        rb.velocity = new Vector3(0,0,0);
-        rb.velocity = (sailport.transform.position - transform.position) * 50 * 0.03f;
-        Destroy(gameObject,1f);
+        connectedRB = null;
+        Invoke("disableObject",2);
+    }
+
+    internal void Reset()
+    {
+        isSurvived = false;
+        connectedRB = null;
+        disableObject();
+    }
+
+    private void disableObject()
+    {
+        rb.velocity = new Vector3(0, 0, 0);
+        gameObject.SetActive(false);
     }
 
     private void FixedUpdate()
@@ -122,7 +120,7 @@ public class Surviver : MonoBehaviour
         isSurvived = true;
         connectedRB = followTO;
         smiles.Play();
-        gameObject.GetComponentInParent<SceneManager>().deleteFromObjectList(gameObject);
+        SceneManager.Instance.deleteFromObjectList(gameObject);
         //distance = Vector3.Distance(rb.position, connectedRB.position) + offset;
         //allowedDistance = Vector3.Distance(rb.position, connectedRB.position) + offset;
         //joint.connectedBody = followTO;
