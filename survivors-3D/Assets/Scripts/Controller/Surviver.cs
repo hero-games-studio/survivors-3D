@@ -24,6 +24,7 @@ public class Surviver : MonoBehaviour
     */
 
     [SerializeField] private ParticleSystem smiles;
+    [SerializeField] private ParticleSystem death;
 
 
     private float allowedDistance = 2.5f;
@@ -74,6 +75,14 @@ public class Surviver : MonoBehaviour
         }
     }
 
+    public void die()
+    {
+        death.Play();
+        isSurvived = false;
+        connectedRB = null;
+        Invoke("disableObject", 2);
+    }
+
     internal void endGame()
     {
         smiles.Play();
@@ -120,7 +129,9 @@ public class Surviver : MonoBehaviour
         isSurvived = true;
         connectedRB = followTO;
         smiles.Play();
-        SceneManager.Instance.deleteFromObjectList(gameObject);
+        transform.SetParent(ObjectPooler.Instance.transform);
+        //gameObject.GetComponentInParent<Spawner>().child = null;
+        //SceneManager.Instance.deleteFromObjectList(gameObject);
         //distance = Vector3.Distance(rb.position, connectedRB.position) + offset;
         //allowedDistance = Vector3.Distance(rb.position, connectedRB.position) + offset;
         //joint.connectedBody = followTO;

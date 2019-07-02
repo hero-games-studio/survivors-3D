@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float lerpTimeMul = 6f;
     private Rigidbody rb;
 
-    private float wallDistance;
+    //private float wallDistance;
     //[SerializeField] public float minCamDistance = 6.2f;
 
     [SerializeField] private float maxRotate = 55f;
@@ -39,12 +39,12 @@ public class PlayerController : MonoBehaviour
         GM = Gamemanager.Instance;
         SM = SceneManager.Instance;
 
-        wallDistance = SM.wallDis;
+        //wallDistance = SM.wallDis;
 
     }
 
     private void FixedUpdate()
-    {
+    { 
         if (GM.onPlay)
         {
             Vector3 forw = Vector3.forward * verticalSpeed * Time.deltaTime;
@@ -63,7 +63,9 @@ public class PlayerController : MonoBehaviour
             if ((transform.rotation.eulerAngles.x < 275 && transform.rotation.eulerAngles.x > 45) ||
                 (transform.rotation.eulerAngles.x < -45 && transform.rotation.eulerAngles.x > -275) ||
                 (transform.rotation.eulerAngles.z < 275 && transform.rotation.eulerAngles.z > 45) ||
-                (transform.rotation.eulerAngles.z < -45 && transform.rotation.eulerAngles.z > -275))
+                (transform.rotation.eulerAngles.z < -45 && transform.rotation.eulerAngles.z > -275) ||
+                (transform.rotation.eulerAngles.y < 260 && transform.rotation.eulerAngles.y > 60) ||
+                (transform.rotation.eulerAngles.y < -60 && transform.rotation.eulerAngles.y > -260))
             {
                 Debug.Log("Gameover");
                 GM.Gameover();
@@ -120,7 +122,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
+    /*
     private void LateUpdate()
     {
         Vector3 pos = transform.position;
@@ -128,15 +130,10 @@ public class PlayerController : MonoBehaviour
         if (pos.x > wallDistance) { pos.x = wallDistance; }
         if (pos.x < -wallDistance) { pos.x = -wallDistance; }
 
-        /*
-        if(pos.z < Camera.main.transform.position.z + minCamDistance)
-        {
-            pos.z = Camera.main.transform.position.z + minCamDistance;
-        }
-        */
         transform.position = pos;
 
     }
+    */
 
     public void OnTriggerEnter(Collider other)
     {

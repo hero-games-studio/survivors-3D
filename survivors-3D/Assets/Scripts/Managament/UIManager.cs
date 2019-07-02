@@ -36,11 +36,13 @@ public class UIManager : MonoBehaviour
     private SceneManager SM;
     private Gamemanager GM;
 
+
     // Start is called before the first frame update
     void Start()
     {
         SM = SceneManager.Instance;
         GM = Gamemanager.Instance;
+
     }
 
     // Update is called once per frame
@@ -64,8 +66,8 @@ public class UIManager : MonoBehaviour
 
     public void OnWait()
     {
-        levelText.text = "Level " + GM.level.ToString();
-        rescueText.text = "You Saved " + GM.rescuedNum + " Person";
+        levelText.text = "Level " + Gamemanager.Instance.level;
+        rescueText.text = "You Saved " + Gamemanager.Instance.rescuedNum + " Person";
         rescueText.gameObject.SetActive(true);
         levelText.gameObject.SetActive(true);
         runButton.gameObject.SetActive(true);

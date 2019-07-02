@@ -6,18 +6,15 @@ using UnityEngine;
 public class Rescue : MonoBehaviour
 {
 
-    public int rescueNumber;
-    public List<GameObject> salvage;
+    public Queue<GameObject> salvage;
     private Rigidbody rb;
-
-
 
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        salvage = new List<GameObject>();
+        salvage = new Queue<GameObject>();
 
     }
 
@@ -37,34 +34,36 @@ public class Rescue : MonoBehaviour
 
             if (!surviver.isSurvived)
             {
-                rescueNumber += 1;
                 surviver.rescue(rb);
-                salvage.Add(other.gameObject);
+                salvage.Enqueue(other.gameObject);
 
             }
         }
     }
 
+    internal void FirstSurviverDie()
+    {
+        salvage.Peek().GetComponent<Surviver>().die();
+        salvage.Dequeue();
 
+    }
 
     internal void releaseSurvivors()
     {
-        rescueNumber = 0;
         while (salvage.Count > 0)
         {
-            salvage[0].GetComponent<Surviver>().endGame();
-            salvage.RemoveAt(0);
+            salvage.Peek().GetComponent<Surviver>().endGame();
+            salvage.Dequeue();
         }
         salvage.Clear();
     }
 
     internal void Reset()
     {
-        rescueNumber = 0;
         while (salvage.Count > 0)
         {
-            salvage[0].GetComponent<Surviver>().Reset();
-            salvage.RemoveAt(0);
+            salvage.Peek().GetComponent<Surviver>().Reset();
+            salvage.Dequeue();
         }
         salvage.Clear();
     }

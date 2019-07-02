@@ -30,7 +30,7 @@ public class Gamemanager : MonoBehaviour
     public bool onPlay;
 
 
-    [SerializeField] private GameObject player;
+    private GameObject player;
 
     public GameObject finishPoint;
 
@@ -38,6 +38,7 @@ public class Gamemanager : MonoBehaviour
 
     private SceneManager SM;
     private UIManager UIM;
+    private PlayerManager PM;
 
     private IEnumerator coroutine;
 
@@ -51,16 +52,22 @@ public class Gamemanager : MonoBehaviour
             level = loadData.level;
             rescuedNum = loadData.rescuedNum;
         }
+        else
+        {
+            level = 1;
+            rescuedNum = 0;
+        }
 
         SM = SceneManager.Instance;
         UIM = UIManager.Instance;
+        PM = PlayerManager.Instance;
+
+        player = PM.player;
 
 
         UIM.OnWait();
         onPlay = false;
         SM.createPath(level);
-        player.GetComponent<Rescue>().rescueNumber = 0;
-
         
     }
 
@@ -89,7 +96,7 @@ public class Gamemanager : MonoBehaviour
 
         
         level++;
-        rescuedNum += player.GetComponent<Rescue>().rescueNumber;
+        rescuedNum += player.GetComponent<Rescue>().salvage.Count;
         player.GetComponent<Rescue>().releaseSurvivors();
         numOfSurviver = 0;
         onPlay = false;
