@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float accelerateSpeed = 3f;
     [SerializeField] private float turnSpeed = 15f;
     [SerializeField] private float sensitivity = 0.03f;
-    [SerializeField] private float lerpTimeMul = 6f;
+    [SerializeField] private float lerpTimeMul = .3f;
     private Rigidbody rb;
 
     //private float wallDistance;
@@ -29,6 +29,9 @@ public class PlayerController : MonoBehaviour
     private Gamemanager GM;
     private SceneManager SM;
 
+    Vector2 deltaPosition = Vector2.zero;
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -41,24 +44,49 @@ public class PlayerController : MonoBehaviour
 
         //wallDistance = SM.wallDis;
 
+
+
     }
 
-    private void FixedUpdate()
+    public void play()
+    {
+        StartCoroutine("FixedUpdateRoutine");
+        StartCoroutine("UpdateRoutine");
+    }
+    public void stop()
+    {
+        StopCoroutine("FixedUpdateRoutine");
+        StopCoroutine("UpdateRoutine");
+    }
+
+
+    IEnumerator FixedUpdateRoutine()
     { 
-        if (GM.onPlay)
+        while (true)
         {
             Vector3 forw = Vector3.forward * verticalSpeed * Time.deltaTime;
-            rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, forw.z);
+
+            if (deltaPosition != Vector2.zero)
+            {
+                lastRotY = rotY;
+                Quaternion currentRotation = Quaternion.Euler(0, rotY, 0);
+                lastRotation = currentRotation;
+                GetComponent<Rigidbody>().rotation = Quaternion.Lerp(transform.rotation, lastRotation, lerpTimeMul);
+            }
+
+            Vector3 rotationForce = new Vector3(rb.rotation.y, 0, 0) * horizontalSpeed * sensitivity * accelerateSpeed;
+            rb.velocity = new Vector3(rotationForce.x, rb.velocity.y, forw.z);
+
+            yield return new WaitForFixedUpdate();
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        //Debug.Log(transform.rotation.eulerAngles);
-        //Debug.Log(Input.GetAxis("Horizontal") + " " + Input.GetAxis("Vertical"));
+    
 
-        if (GM.onPlay)
+    IEnumerator UpdateRoutine()
+    {
+
+        while (true)
         {
             if ((transform.rotation.eulerAngles.x < 275 && transform.rotation.eulerAngles.x > 45) ||
                 (transform.rotation.eulerAngles.x < -45 && transform.rotation.eulerAngles.x > -275) ||
@@ -72,8 +100,7 @@ public class PlayerController : MonoBehaviour
             }
 
 
-            Vector2 deltaPosition = Vector2.zero;
-
+            deltaPosition = Vector2.zero;
 
             if (Input.GetMouseButton(0))
             {
@@ -86,21 +113,7 @@ public class PlayerController : MonoBehaviour
 
                 rotY += deltaPosition.x * Time.deltaTime * turnSpeed;
                 rotY = Mathf.Clamp(rotY, -maxRotate, maxRotate);
-                //if (rotY > maxRotate) { rotY = maxRotate; }
-                //if (rotY < -maxRotate) { rotY = -maxRotate; }
 
-
-                //transform.rotation = Quaternion.Euler(0,rotY,0);
-
-                if (deltaPosition != Vector2.zero)
-                {
-                    lastRotY = rotY;
-                    Quaternion currentRotation = Quaternion.Euler(0, rotY, 0);
-                    lastRotation = currentRotation;
-                    //Debug.Log(rotY + " -> " + lastRotation + " ||| " + currentRotation);
-                    transform.rotation = Quaternion.Lerp(transform.rotation, lastRotation, Time.deltaTime * lerpTimeMul);
-                    //transform.rotation = lastRotation;
-                }
 
 
             }
@@ -112,28 +125,11 @@ public class PlayerController : MonoBehaviour
                          //rb.velocity = Vector3.zero;
             }
 
-            Vector3 force = new Vector3(deltaPosition.x, 0, 0) * horizontalSpeed * sensitivity;
-            //rb.AddForce(force);
-            rb.velocity = new Vector3(force.x, rb.velocity.y, rb.velocity.z);
+            
 
-
-            Vector3 rotationForce = new Vector3(rb.rotation.y, 0, 0) * horizontalSpeed * sensitivity * accelerateSpeed;
-            rb.velocity = new Vector3(rotationForce.x, rb.velocity.y, rb.velocity.z);
+            yield return null;
         }
     }
-
-    /*
-    private void LateUpdate()
-    {
-        Vector3 pos = transform.position;
-
-        if (pos.x > wallDistance) { pos.x = wallDistance; }
-        if (pos.x < -wallDistance) { pos.x = -wallDistance; }
-
-        transform.position = pos;
-
-    }
-    */
 
     public void OnTriggerEnter(Collider other)
     {

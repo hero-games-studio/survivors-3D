@@ -45,12 +45,6 @@ public class UIManager : MonoBehaviour
 
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void UpdateProgress(float val)
     {
         progressBar.value = val;
@@ -77,7 +71,7 @@ public class UIManager : MonoBehaviour
     public void runButtonOnClick()
     {
 
-        GM.runnGame();
+        GM.play();
     }
 
 }

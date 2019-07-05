@@ -12,101 +12,123 @@ public class Shark : MonoBehaviour
     [SerializeField] private float attackRadius = 1f;
 
     [SerializeField] private float wanderRadius = 10f;
-    private Vector3 wanderPoint;
+    
 
-    private bool canHunt;
-    private bool hunting;
-    private Transform target;
+
+    [SerializeField] Transform target;
     [SerializeField] private NavMeshAgent agent;
+
+
+    public List<Transform> moveSpots = new List<Transform>();
+    [SerializeField] Transform wanderPoint;
+    private int spot;
+    private int randomSpot;
+
+
 
     // Start is called before the first frame update
     void Start()
     {
-        canHunt = false;
-        hunting = false;
-        //target = PlayerManager.Instance.player.transform;
-        agent = GetComponent<NavMeshAgent>();
+        target = null;
+        agent = gameObject.GetComponent<NavMeshAgent>();
         agent.Warp(transform.position);
+        spot = 0;
+    }
 
-        wanderPoint = WanderPosition();
+    private void OnDisable()
+    {
+        target = null;
+        spot = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
 
-        float playerDis = Vector3.Distance(transform.position, PlayerManager.Instance.player.transform.position);
-        if(playerDis <= lookRadius)
+        if (target == null || !target.gameObject.activeSelf)
         {
-            canHunt = true;
-        }
-        else
-        {
-            canHunt = false;
-            hunting = false;
-        }
+            float playerDis = Vector3.Distance(transform.position, PlayerManager.Instance.player.transform.position);
 
-
-        if (!hunting && canHunt)
-        {
-            if(PlayerManager.Instance.player.GetComponent<Rescue>().salvage.Count > 0)
+            if (playerDis <= lookRadius && PlayerManager.Instance.player.GetComponent<Rescue>().salvage.Count > 0)
             {
                 target = PlayerManager.Instance.player.GetComponent<Rescue>().salvage.Peek().transform;
-                hunting = true;
             }
-        }
+            else
+            {
+                if (moveSpots.Count > 0)
+                {
+                    wander();
+                }
+            }
 
-        if (hunting && canHunt)
+        }
+        else
         {
             float distance = Vector3.Distance(transform.position, target.position);
 
             if (distance <= lookRadius)
             {
                 agent.SetDestination(target.position);
-                FaceTarget();
+                FaceTarget(target);
 
-                if(distance <= attackRadius)
+                if (distance <= attackRadius)
                 {
                     PlayerManager.Instance.player.GetComponent<Rescue>().FirstSurviverDie();
                     //SceneManager.Instance.killObstacle(gameObject);
                     gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     gameObject.SetActive(false);
-                    hunting = false;
-                    canHunt = false;
                 }
             }
         }
-        else
+        
+    }
+
+    internal void setMovePoints(GameObject path)
+    {
+        while(moveSpots.Count > 0)
         {
-            wander();
+            moveSpots.RemoveAt(0);
+        }
+        moveSpots.Clear();
+
+        //Transform[] points = path.GetComponentsInChildren<Transform>();
+        foreach(Transform ts in path.GetComponent<PathPoints>().points)
+        {
+            moveSpots.Add(ts);
         }
 
+        spot = 0;
+        //randomSpot = UnityEngine.Random.Range(0, moveSpots.Count - 1);
+        wanderPoint = moveSpots[randomSpot];
     }
 
     private void wander()
     {
-        if(Vector3.Distance(wanderPoint, transform.position) < 0.5f)
+
+        if(Vector3.Distance(wanderPoint.position, transform.position) < 1f)
         {
-            wanderPoint = WanderPosition();
+            //randomSpot = UnityEngine.Random.Range(0, moveSpots.Count-1);
+            spot++;
+            if (spot == moveSpots.Count)
+            {
+                spot = 0;
+            }
+            wanderPoint = moveSpots[spot];
+                //WanderPosition();
         }
 
-        agent.SetDestination(wanderPoint);
-    }
-
-    private Vector3 WanderPosition()
-    {
-        Vector3 randomPosition = (UnityEngine.Random.insideUnitSphere * wanderRadius) + transform.position;
-        NavMeshHit navHit;
-        NavMesh.SamplePosition(randomPosition, out navHit, wanderRadius, -5);
-        return navHit.position;
+        //transform.position = Vector3.MoveTowards(transform.position, wanderPoint.position, Time.deltaTime*agent.speed);
+        FaceTarget(wanderPoint);
+        agent.SetDestination(wanderPoint.position);
+        //agent.SetDestination(wanderPoint);
     }
 
 
-    private void FaceTarget()
+    private void FaceTarget(Transform fTarget)
     {
-        Vector3 direction = (target.position - transform.position).normalized;
+        Vector3 direction = (fTarget.position - transform.position).normalized;
         Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x,0,direction.z));
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime*5f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime*(agent.acceleration/8));
     }
 
 

@@ -13,6 +13,9 @@ public class Gamemanager : MonoBehaviour
 
     private void Awake()
     {
+
+        Application.targetFrameRate = 60;
+
         if(Instance == null)
         {
             Instance = this;
@@ -66,60 +69,55 @@ public class Gamemanager : MonoBehaviour
 
 
         UIM.OnWait();
-        onPlay = false;
+        PlayerManager.Instance.player.GetComponent<PlayerController>().stop();
         SM.createPath(level);
         
     }
 
-    // Update is called once per frame
-    void Update()
+
+    public void play()
     {
-
-        UIM.UpdateProgress((player.transform.position.z / finishPoint.transform.position.z));
-
-    }
-
-
-    IEnumerator Example()
-    {
-        yield return new WaitForSeconds(3);
-    }
-
-    public void runnGame()
-    {
-        onPlay = true;
+        PlayerManager.Instance.player.GetComponent<PlayerController>().play();
         UIM.OnPlay();
+        StartCoroutine("UpdateRoutine");
+    }
+
+    private void stop()
+    {
+        numOfSurviver = 0;
+        PlayerManager.Instance.player.GetComponent<PlayerController>().stop();
+        StartCoroutine(coroutine);
+        StopCoroutine("UpdateRoutine");
+    }
+
+
+
+    // Update is called once per frame
+    IEnumerator UpdateRoutine()
+    {
+        while (true)
+        {
+            UIM.UpdateProgress((player.transform.position.z / finishPoint.transform.position.z));
+            yield return null;
+        }
     }
 
     public void finish()
     {
-
-        
         level++;
         rescuedNum += player.GetComponent<Rescue>().salvage.Count;
         player.GetComponent<Rescue>().releaseSurvivors();
-        numOfSurviver = 0;
-        onPlay = false;
-
         coroutine = resetScene(1f);
-        StartCoroutine(coroutine);
-
         SaveSystem.SaveGameData(Instance);
-
+        stop();
     }
 
     public void Gameover()
     {
-        
         player.GetComponent<Rescue>().Reset();
-        numOfSurviver = 0;
-        onPlay = false;
-
         coroutine = resetScene(0.5f);
-        StartCoroutine(coroutine);
+        stop();
     }
-
-
 
     private IEnumerator resetScene(float waitTime)
     {

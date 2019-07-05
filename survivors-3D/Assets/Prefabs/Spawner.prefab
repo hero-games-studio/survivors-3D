@@ -49,3 +49,4 @@ MonoBehaviour:
   randomY: 0
   position: {x: 0, y: 0, z: 0}
   spawnPoint: {x: 0, y: 0, z: 0}
+  path: {fileID: 0}
