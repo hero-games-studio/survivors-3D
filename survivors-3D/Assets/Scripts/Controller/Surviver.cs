@@ -5,12 +5,11 @@ using UnityEngine;
 
 public class Surviver : MonoBehaviour
 {
-
-    public bool isSurvived;
     public Rigidbody rb;
     [SerializeField] private float offset = .1f;
     [SerializeField] private Vector3 followAnchor = new Vector3(0,0.5f,0);
     public float survivedNumber;
+    public bool isSurvived;
 
     //[SerializeField] private ConfigurableJoint joint;
 
@@ -48,12 +47,10 @@ public class Surviver : MonoBehaviour
         //joint = GetComponent<ConfigurableJoint>();
     }
 
-    // Update is called once per frame
-    void Update()
+
+    IEnumerator followRoutine()
     {
-
-
-        if (isSurvived)
+        while (true)
         {
             transform.LookAt(connectedRB.transform);
             if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out shot))
@@ -62,74 +59,59 @@ public class Surviver : MonoBehaviour
 
                 targetDistance = shot.distance;
 
-                float newSpeed = Mathf.Clamp(((targetDistance-minSpeed)/disDiv), minSpeed, maxSpeed);
+                float newSpeed = Mathf.Clamp(((targetDistance - minSpeed) / disDiv), minSpeed, maxSpeed);
 
 
                 //Debug.Log(targetDistance + " || " + followSpeed + " || " + (targetDistance / 10));
                 if (connectedRB.position.z > transform.position.z)
                 {
-                    rb.velocity = (connectedRB.position - transform.position)* (connectedRB.position - transform.position).z;
+                    rb.velocity = (connectedRB.position - transform.position) * (connectedRB.position - transform.position).z;
                 }
             }
 
+            yield return null;
         }
     }
 
+
     public void die()
     {
+        StopCoroutine("followRoutine");
         death.Play();
-        isSurvived = false;
         connectedRB = null;
         Invoke("disableObject", 2);
     }
 
     internal void endGame()
     {
+        StopCoroutine("followRoutine");
         smiles.Play();
-        isSurvived = false;
         connectedRB = null;
         Invoke("disableObject",2);
     }
 
     internal void Reset()
     {
-        isSurvived = false;
+        StopCoroutine("followRoutine");
         connectedRB = null;
         disableObject();
     }
 
     private void disableObject()
     {
+        isSurvived = false;
         rb.velocity = new Vector3(0, 0, 0);
         gameObject.SetActive(false);
     }
 
-    private void FixedUpdate()
-    {
-        /*
-        if (isSurvived)
-        {
-
-            var connection = rb.position - connectedRB.position;
-            var distanceDiscrepancy = distance - connection.magnitude;
-
-            rb.position += distanceDiscrepancy * connection.normalized;
-
-            var velocityTarget = connection + (rb.velocity + Physics.gravity * spring);
-            var projectOnConnection = Vector3.Project(velocityTarget, connection);
-
-            rb.velocity = (velocityTarget - projectOnConnection) / (1 + damper * Time.fixedDeltaTime);
-        }*/
-
-    }
-
-
     public void rescue(Rigidbody followTO)
-    { 
+    {
         isSurvived = true;
+        
         connectedRB = followTO;
         smiles.Play();
         transform.SetParent(ObjectPooler.Instance.transform);
+        StartCoroutine("followRoutine");
         //gameObject.GetComponentInParent<Spawner>().child = null;
         //SceneManager.Instance.deleteFromObjectList(gameObject);
         //distance = Vector3.Distance(rb.position, connectedRB.position) + offset;

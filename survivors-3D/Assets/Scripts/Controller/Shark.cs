@@ -43,15 +43,14 @@ public class Shark : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
-
-        if (target == null || !target.gameObject.activeSelf)
+    {  
+        if (target == null)
         {
             float playerDis = Vector3.Distance(transform.position, PlayerManager.Instance.player.transform.position);
 
             if (playerDis <= lookRadius && PlayerManager.Instance.player.GetComponent<Rescue>().salvage.Count > 0)
             {
-                target = PlayerManager.Instance.player.GetComponent<Rescue>().salvage.Peek().transform;
+                target = PlayerManager.Instance.player.GetComponent<Rescue>().salvage[0].transform;
             }
             else
             {
@@ -64,21 +63,28 @@ public class Shark : MonoBehaviour
         }
         else
         {
-            float distance = Vector3.Distance(transform.position, target.position);
 
-            if (distance <= lookRadius)
+            if (!target.gameObject.activeSelf)
             {
-                agent.SetDestination(target.position);
-                FaceTarget(target);
+                target = null;
+            }
+            else
+            {
+                float distance = Vector3.Distance(transform.position, target.position);
 
-                if (distance <= attackRadius)
+                if (distance <= lookRadius)
                 {
-                    PlayerManager.Instance.player.GetComponent<Rescue>().FirstSurviverDie();
-                    //SceneManager.Instance.killObstacle(gameObject);
-                    gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-                    gameObject.SetActive(false);
+                    agent.SetDestination(target.position);
+                    FaceTarget(target);
+
+                    if (distance <= attackRadius)
+                    {
+                        PlayerManager.Instance.player.GetComponent<Rescue>().FirstSurviverDie();
+                        gameObject.SetActive(false);
+                    }
                 }
             }
+            
         }
         
     }

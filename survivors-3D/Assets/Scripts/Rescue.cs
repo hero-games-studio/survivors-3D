@@ -6,7 +6,7 @@ using UnityEngine;
 public class Rescue : MonoBehaviour
 {
 
-    public Queue<GameObject> salvage;
+    public List<GameObject> salvage;
     private Rigidbody rb;
 
 
@@ -14,7 +14,7 @@ public class Rescue : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        salvage = new Queue<GameObject>();
+        salvage = new List<GameObject>();
 
     }
 
@@ -28,23 +28,16 @@ public class Rescue : MonoBehaviour
     {
 		if (other.gameObject.CompareTag("Surviver"))
         {
-
             Surviver surviver = other.gameObject.GetComponent<Surviver>();
-
-
-            if (!surviver.isSurvived)
-            {
-                surviver.rescue(rb);
-                salvage.Enqueue(other.gameObject);
-
-            }
+            surviver.rescue(rb);
+            salvage.Add(other.gameObject);
         }
     }
 
     internal void FirstSurviverDie()
     {
-        salvage.Peek().GetComponent<Surviver>().die();
-        salvage.Dequeue();
+        salvage[0].GetComponent<Surviver>().die();
+        salvage.RemoveAt(0);
 
     }
 
@@ -52,8 +45,8 @@ public class Rescue : MonoBehaviour
     {
         while (salvage.Count > 0)
         {
-            salvage.Peek().GetComponent<Surviver>().endGame();
-            salvage.Dequeue();
+            salvage[0].GetComponent<Surviver>().endGame();
+            salvage.RemoveAt(0);
         }
         salvage.Clear();
     }
@@ -62,8 +55,8 @@ public class Rescue : MonoBehaviour
     {
         while (salvage.Count > 0)
         {
-            salvage.Peek().GetComponent<Surviver>().Reset();
-            salvage.Dequeue();
+            salvage[0].GetComponent<Surviver>().Reset();
+            salvage.RemoveAt(0);
         }
         salvage.Clear();
     }

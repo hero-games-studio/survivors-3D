@@ -1732,7 +1732,7 @@ PrefabInstance:
     - target: {fileID: 8166220004952725675, guid: 6cf4fbc7406604fcea7978a78e668180,
         type: 3}
       propertyPath: m_Name
-      value: boat_2
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 8167512272507124525, guid: 6cf4fbc7406604fcea7978a78e668180,
         type: 3}

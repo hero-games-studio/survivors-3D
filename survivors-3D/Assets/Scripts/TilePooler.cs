@@ -69,6 +69,9 @@ public class TilePooler : MonoBehaviour
         objectToSpawn.SetActive(true);
         objectToSpawn.transform.position = position;
         objectToSpawn.transform.rotation = rotation;
+
+        objectToSpawn.GetComponentInChildren<WaterDecoretor>().surface = surface;
+        objectToSpawn.GetComponentInChildren<WaterDecoretor>().resetNavMesh();
         /*
         IPooledObject pooledObject = objectToSpawn.GetComponent<IPooledObject>();
 
