@@ -102,31 +102,57 @@ public class PlayerController : MonoBehaviour
 
             deltaPosition = Vector2.zero;
 
-            if (Input.GetMouseButton(0))
-            {
-                Vector2 currentMousePosition = Input.mousePosition;
 
-                if (lastMousePosition == Vector2.zero) { lastMousePosition = currentMousePosition; }
+            #if UNITY_EDITOR
 
-                deltaPosition = currentMousePosition - lastMousePosition;
-                lastMousePosition = currentMousePosition;
+                if (Input.GetMouseButton(0))
+                {
+                    Vector2 currentMousePosition = Input.mousePosition;
 
-                rotY += deltaPosition.x * Time.deltaTime * turnSpeed;
-                rotY = Mathf.Clamp(rotY, -maxRotate, maxRotate);
+                    if (lastMousePosition == Vector2.zero) { lastMousePosition = currentMousePosition; }
+
+                    deltaPosition = currentMousePosition - lastMousePosition;
+                    lastMousePosition = currentMousePosition;
+
+                    rotY += deltaPosition.x * Time.deltaTime * turnSpeed;
+                    rotY = Mathf.Clamp(rotY, -maxRotate, maxRotate);
 
 
 
-            }
-            else
-            {
-                lastMousePosition = Vector2.zero;
-                lastRotation = new Quaternion(0f, 0f, 0f, 1f);
-                rotY = 0;//transform.rotation.eulerAngles.y;
-                         //rb.velocity = Vector3.zero;
-            }
+                }
+                else
+                {
+                    lastMousePosition = Vector2.zero;
+                    lastRotation = new Quaternion(0f, 0f, 0f, 1f);
+                    rotY = 0;//transform.rotation.eulerAngles.y;
+                             //rb.velocity = Vector3.zero;
+                }
+            #endif
+            #if UNITY_ANDROID || UNITY_IOS || UNITY_IPHONE
 
-            
+                if (Input.touchCount > 0)//Input.GetMouseButton(0))
+                    {
+                        Vector2 currentMousePosition = Input.touches[0].position;
 
+                        if (lastMousePosition == Vector2.zero) { lastMousePosition = currentMousePosition; }
+
+                        deltaPosition = currentMousePosition - lastMousePosition;
+                        lastMousePosition = currentMousePosition;
+
+                        rotY += deltaPosition.x * Time.deltaTime * turnSpeed;
+                        rotY = Mathf.Clamp(rotY, -maxRotate, maxRotate);
+
+
+
+                    }
+                    else
+                    {
+                        lastMousePosition = Vector2.zero;
+                        lastRotation = new Quaternion(0f, 0f, 0f, 1f);
+                        rotY = 0;//transform.rotation.eulerAngles.y;
+                                    //rb.velocity = Vector3.zero;
+                    }
+            #endif
             yield return null;
         }
     }
